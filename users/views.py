@@ -1,0 +1,40 @@
+from rest_framework.generics import CreateAPIView, UpdateAPIView, ListAPIView, RetrieveAPIView, DestroyAPIView
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
+
+from posts.permissions import IsOwner
+from users.models import CustomUser
+from users.serializers import UserSerializer
+
+
+# Create your views here.
+class UserCreateAPIView(CreateAPIView):
+    serializer_class = UserSerializer
+    queryset = CustomUser.objects.all()
+
+    def perform_create(self, serializer):
+        user = serializer.save()
+        user.set_password(user.password)
+        user.save()
+
+
+class UserUpdateAPIView(UpdateAPIView):
+    serializer_class = UserSerializer
+    permission_classes = [IsOwner, IsAdminUser]
+    queryset = CustomUser.objects.all()
+
+
+class UserListAPIView(ListAPIView):
+    permission_classes = [IsOwner, IsAuthenticated]
+    serializer_class = UserSerializer
+    queryset = CustomUser.objects.all()
+
+
+class UserRetrieveAPIView(RetrieveAPIView):
+    permission_classes = [IsOwner, IsAdminUser]
+    serializer_class = UserSerializer
+    queryset = CustomUser.objects.all()
+
+
+class UserDestroyAPIView(DestroyAPIView):
+    permission_classes = [IsAdminUser,]
+    queryset = CustomUser.objects.all()
